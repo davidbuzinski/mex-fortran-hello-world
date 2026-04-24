@@ -1,18 +1,13 @@
 name: Run MATLAB Tests on GitHub-Hosted Runner
 on: [push]
 jobs:
-  my-job:
-    name: Run MATLAB Tests and Generate Artifacts
+  setup-fortran:
+    name: "setup-fortran: ${{ matrix.compiler }} on ${{ matrix.os }}"
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            compiler: gcc
-          - os: windows-latest
-            compiler: intel
-          - os: macos-latest
-            compiler: intel
+        os: [macos-latest, macos-13]
+        compiler: [gcc, intel-classic]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
@@ -26,5 +21,60 @@ jobs:
         uses: matlab-actions/run-command@v3
         with:
           command: mex -setup Fortran
-      - name: Run tests and generate artifacts
-        uses: matlab-actions/run-build@v3
+
+  homebrew-gcc:
+    name: "homebrew gcc on ${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Install gfortran via Homebrew
+        run: brew install gcc
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v3
+      - name: Setup MEX
+        uses: matlab-actions/run-command@v3
+        with:
+          command: mex -setup Fortran
+
+  homebrew-flang:
+    name: "homebrew flang on ${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Install flang via LLVM
+        run: brew install llvm flang
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v3
+      - name: Setup MEX
+        uses: matlab-actions/run-command@v3
+        with:
+          command: mex -setup Fortran
+
+  homebrew-lfortran:
+    name: "homebrew lfortran on ${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Install LFortran
+        run: brew install lfortran
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v3
+      - name: Setup MEX
+        uses: matlab-actions/run-command@v3
+        with:
+          command: mex -setup Fortran
