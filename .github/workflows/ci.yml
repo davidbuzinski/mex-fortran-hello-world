@@ -11,6 +11,8 @@ jobs:
             compiler: gcc
           - os: windows-latest
             compiler: intel
+          - os: macos-26-intel
+            compiler: intel
           - os: macos-latest
             compiler: intel
     runs-on: ${{ matrix.os }}
